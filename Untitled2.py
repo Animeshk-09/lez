@@ -19,22 +19,29 @@ return value : string
 
 
 import random
-number=random.randint(10,50)
+number=random.randint(1,100)
 c=0
 while c<5:
-    guess = int(input("Guess a number in range 10..50:"))
+    guess = int(input("Guess a number in range 1..100:"))
     if guess == number:
         print("YOU WIN!!:)")
         
         break
     else:
         c+=1
+        if guess < number:
+            print("the correct number is greater than the entered number")
+            
+        else :
+            print("correct number is smaller than entered number")
 if not c<5:
     print("YOU LOSE :(\n The number was", number)
     
 
 
 # In[ ]:
+
+
 
 
 
