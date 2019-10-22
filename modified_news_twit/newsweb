@@ -1,0 +1,76 @@
+import sys
+import string
+import json
+from twython import Twython
+
+#WE WILL USE THE VARIABLES DAY, MONTH, AND YEAR FOR OUR OUTPUT FILE NAME
+import datetime
+now = datetime.datetime.now()
+day=int(now.day)
+month=int(now.month)
+year=int(now.year)
+
+
+#FOR OAUTH AUTHENTICATION -- NEEDED TO ACCESS THE TWITTER API
+t = Twython(app_key="Lk3HuNUQ4TFDcW6S2AUDUygDD", 
+    app_secret="y1ppqCKWqcbfJI1tctu8tGxuL58Oy5GwD2gm2yQIIn2faCA41l",
+    oauth_token="1168161739252232193-xup7bv5ex6gNF4AkBPdT3pH3Q8jfiK" ,
+    oauth_token_secret="ig4S3bi38MGIxamSiyPResmUWWOhQ6X8dwfT7VTVwbmLq")
+   
+# LIST OF TWITTER USER IDS
+ids = "868007548586274816,1066972567943053312,20751449,1095339630751174659,1555266841"
+
+
+users = t.lookup_user(user_id = ids)
+
+
+outfn = "twitter_user_data_%i.%i.%i.txt" % (now.month, now.day, now.year)
+
+#NAMES FOR HEADER ROW IN OUTPUT FILE
+fields = "id screen_name name created_at url followers_count friends_count statuses_count \
+    favourites_count listed_count \
+    contributors_enabled description protected location lang expanded_url".split()
+
+
+
+#THE VARIABLE 'USERS' CONTAINS INFORMATION OF THE 5 TWITTER USER IDS LISTED ABOVE
+#THIS BLOCK WILL LOOP OVER EACH OF THESE IDS, CREATE VARIABLES, AND OUTPUT TO FILE
+for entry in users:
+    #CREATE EMPTY DICTIONARY
+    r = {}
+    for f in fields:
+        r[f] = ""
+    #ASSIGN VALUE OF 'ID' FIELD IN JSON TO 'ID' FIELD IN OUR DICTIONARY
+    r['id'] = entry['id']
+    #SAME WITH 'SCREEN_NAME' HERE, AND FOR REST OF THE VARIABLES
+    r['screen_name'] = entry['screen_name']
+    r['name'] = entry['name']
+    r['created_at'] = entry['created_at']
+    r['url'] = entry['url']
+    r['followers_count'] = entry['followers_count']
+    r['friends_count'] = entry['friends_count']
+    r['statuses_count'] = entry['statuses_count']
+    r['favourites_count'] = entry['favourites_count']
+    r['listed_count'] = entry['listed_count']
+    r['contributors_enabled'] = entry['contributors_enabled']
+    r['description'] = entry['description']
+    r['protected'] = entry['protected']
+    r['location'] = entry['location']
+    r['lang'] = entry['lang']
+    r['profile_image_url'] = entry['profile_image_url']
+    #NOT EVERY ID WILL HAVE A 'URL' KEY, SO CHECK FOR ITS EXISTENCE WITH IF CLAUSE
+    if 'url' in entry['entities']:
+        r['expanded_url'] = entry['entities']['url']['urls'][0]['expanded_url']
+    else:
+        r['expanded_url'] = ''
+    print(r)
+    #CREATE EMPTY LIST
+    lst = []
+    #ADD DATA FOR EACH VARIABLE
+    for f in fields:
+        lst.append(str(r[f]).replace('"', '\\"'))
+        
+    with open('newswebdata.json', 'w') as a:
+        json.dump(lst, a,indent=1)
+        
+   
